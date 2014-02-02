@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Rackspace, Inc.
+# Copyright (c) 2013 Rackspace Hosting, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""marconi-queues (public): handles all the routes for queuing,
+messaging, and claiming.
+"""
 
-import pecan
+from marconi.queues.transport.pecan.controllers import rootcontroller
+from marconi.queues.transport.pecan import driver
 
-from marconi.queues.api.controllers import pecanapi
 
+class Driver(driver.DriverBase):
 
-class RootController(object):
-
-    pecanAPI = pecanapi.PecanAPIController()
-
-    @pecan.expose(generic=True, template='index.html')
-    def index(self):
-        # FIXME: Return version information
-        return dict()
+    @property
+    def bridge(self):
+        rootcontroller.RootController()
