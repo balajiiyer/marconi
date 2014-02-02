@@ -12,16 +12,16 @@
 
 # Server Specific Configurations
 server = {
-    'port': '8777',
-    'host': '0.0.0.0'
+    'port': '7777',
+    'host': '127.0.0.1'
 }
 
 # Pecan Application Configurations
 app = {
-    'root': 'marconi.queues.api.controllers.root.RootController',
-    'modules': ['queues.api'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/queues/api/templates',
+    'root': 'marconi.queues.transport.pecan.controllers.rootcontroller.RootController',
+    'modules': ['marconi.queues.transport.pecan.controllers'],
+    'static_root': '%(confdir)s/static_files',
+    'template_path': '%(confdir)s/pecan_templates',
 }
 
 # Custom Configurations must be in Python dictionary format::
