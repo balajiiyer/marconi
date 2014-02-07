@@ -18,7 +18,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'marconi.queues.transport.pecan.controllers.rootcontroller.RootController',
+    'root': ('marconi.queues.transport.pecan.controllers.'
+             'rootcontroller.RootController'),
     'modules': ['marconi.queues.transport.pecan.controllers'],
     'static_root': '%(confdir)s/static_files',
     'template_path': '%(confdir)s/pecan_templates',

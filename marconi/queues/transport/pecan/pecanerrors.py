@@ -13,20 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marconi.queues.transport import base
-from marconi.queues.transport.pecan.controllers import healthcontroller
-#from marconi.queues.transport.pecan.controllers import queuescontroller
-from pecan import expose
-import marconi.common.cache
-import marconi.queues.
-
-class RootController(object):
+import pecan
+import wsme
 
 
-
-    @expose()
-    def index(self):
-        return "weclome to pecan routing"
-
-    health = healthcontroller.HealthController()
-    #queues = queuescontroller.QueuesController()
+class ClientSideError(wsme.exc.ClientSideError):
+    def __init__(self, error, status_code=400):
+        pecan.response.translatable_error = error
+        super(ClientSideError, self).__init__(error, status_code)
