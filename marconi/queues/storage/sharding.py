@@ -49,6 +49,10 @@ _SHARD_CACHE_PREFIX = 'sharding:'
 _SHARD_CACHE_TTL = 10
 
 
+def _config_options():
+    return common_utils.options_iter(_CATALOG_OPTIONS, _CATALOG_GROUP)
+
+
 def _shard_cache_key(queue, project=None):
     # NOTE(kgriffs): Use string concatenation for performance,
     # also put project first since it is guaranteed to be
@@ -364,7 +368,10 @@ class Catalog(object):
 
         # NOTE(cpp-cabrera): parse general opts: 'drivers'
         uri = shard['uri']
+
+        # pylint: disable=no-member
         storage_type = six.moves.urllib_parse.urlparse(uri).scheme
+
         driver_dict_opts = {'storage': storage_type}
         driver_opts = common_utils.dict_to_conf(driver_dict_opts)
 
@@ -433,7 +440,7 @@ class Catalog(object):
             shard = select.weighted(self._shards_ctrl.list(limit=0))
 
             if not shard:
-                raise errors.NoShardsFound()
+                raise errors.NoShardFound()
 
             self._catalogue_ctrl.insert(project, queue, shard['name'])
 

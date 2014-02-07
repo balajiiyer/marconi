@@ -21,7 +21,7 @@ import ddt
 import six
 from testtools import matchers
 
-from marconi.common.cache import cache as oslo_cache
+from marconi.openstack.common.cache import cache as oslo_cache
 from marconi.openstack.common import timeutils
 from marconi.queues import storage
 from marconi.queues.storage import errors
@@ -47,12 +47,16 @@ class ControllerBaseTest(testing.TestBase):
                               self.controller_class,
                               self.controller_base_class))
 
-        cache = oslo_cache.get_cache(self.conf)
+        oslo_cache.register_oslo_configs(self.conf)
+        cache = oslo_cache.get_cache(self.conf.cache_url)
+
+        # pylint: disable=not-callable
         self.driver = self.driver_class(self.conf, cache)
         self._prepare_conf()
 
         self.addCleanup(self._purge_databases)
 
+        # pylint: disable=not-callable
         self.controller = self.controller_class(self.driver)
 
     def _prepare_conf(self):
@@ -73,7 +77,7 @@ class ControllerBaseTest(testing.TestBase):
 @ddt.ddt
 class QueueControllerTest(ControllerBaseTest):
     """Queue Controller base tests."""
-    controller_base_class = storage.QueueBase
+    controller_base_class = storage.Queue
 
     def setUp(self):
         super(QueueControllerTest, self).setUp()
@@ -223,7 +227,7 @@ class MessageControllerTest(ControllerBaseTest):
     to clean up storage's state.
     """
     queue_name = 'test_queue'
-    controller_base_class = storage.MessageBase
+    controller_base_class = storage.Message
 
     # Specifies how often expired messages are purged, in sec.
     gc_interval = 0
@@ -457,7 +461,7 @@ class ClaimControllerTest(ControllerBaseTest):
     to clean up storage's state.
     """
     queue_name = 'test_queue'
-    controller_base_class = storage.ClaimBase
+    controller_base_class = storage.Claim
 
     def setUp(self):
         super(ClaimControllerTest, self).setUp()

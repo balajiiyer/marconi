@@ -24,7 +24,8 @@ Serves to construct an association between a project + queue -> shard
 """
 
 import marconi.openstack.common.log as logging
-from marconi.queues.storage import base, errors
+from marconi.queues.storage import base
+from marconi.queues.storage import errors
 from marconi.queues.storage.mongodb import utils
 
 
@@ -42,7 +43,7 @@ class CatalogueController(base.CatalogueBase):
     def __init__(self, *args, **kwargs):
         super(CatalogueController, self).__init__(*args, **kwargs)
 
-        self._col = self.driver.catalogue_database.catalogue
+        self._col = self.driver.database.catalogue
         self._col.ensure_index(CATALOGUE_INDEX, unique=True)
 
     @utils.raises_conn_error

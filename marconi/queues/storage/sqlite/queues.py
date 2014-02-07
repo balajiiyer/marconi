@@ -19,7 +19,7 @@ from marconi.queues.storage import errors
 from marconi.queues.storage.sqlite import utils
 
 
-class QueueController(base.QueueBase):
+class QueueController(base.Queue):
 
     def list(self, project, marker=None,
              limit=None, detailed=False):
@@ -77,10 +77,9 @@ class QueueController(base.QueueBase):
         if project is None:
             project = ''
 
-        # msgpack of {} is "\x80"
         self.driver.run('''
             insert or ignore into Queues
-            values (null, ?, ?, "\x80")
+            values (null, ?, ?, "{}")
         ''', project, name)
 
         return self.driver.affected

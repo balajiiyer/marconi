@@ -27,7 +27,8 @@ Schema:
 import functools
 
 from marconi.common import utils as common_utils
-from marconi.queues.storage import base, errors
+from marconi.queues.storage import base
+from marconi.queues.storage import errors
 from marconi.queues.storage.mongodb import utils
 
 SHARDS_INDEX = [
@@ -48,7 +49,7 @@ class ShardsController(base.ShardsBase):
     def __init__(self, *args, **kwargs):
         super(ShardsController, self).__init__(*args, **kwargs)
 
-        self._col = self.driver.shards_database.shards
+        self._col = self.driver.database.shards
         self._col.ensure_index(SHARDS_INDEX,
                                background=True,
                                name='shards_name',

@@ -14,24 +14,15 @@
 # limitations under the License.
 
 import contextlib
+import json
 import sqlite3
 import uuid
-
-import msgpack
-from oslo.config import cfg
 
 from marconi.common import decorators
 from marconi.queues import storage
 from marconi.queues.storage.sqlite import controllers
+from marconi.queues.storage.sqlite import options
 from marconi.queues.storage.sqlite import utils
-
-
-_SQLITE_OPTIONS = [
-    cfg.StrOpt('database', default=':memory:',
-               help='Sqlite database to use.')
-]
-
-_SQLITE_GROUP = 'drivers:storage:sqlite'
 
 
 class DataDriver(storage.DataDriverBase):
@@ -39,8 +30,9 @@ class DataDriver(storage.DataDriverBase):
     def __init__(self, conf, cache):
         super(DataDriver, self).__init__(conf, cache)
 
-        self.conf.register_opts(_SQLITE_OPTIONS, group=_SQLITE_GROUP)
-        self.sqlite_conf = self.conf[_SQLITE_GROUP]
+        self.conf.register_opts(options.SQLITE_OPTIONS,
+                                group=options.SQLITE_GROUP)
+        self.sqlite_conf = self.conf[options.SQLITE_GROUP]
 
         self.__path = self.sqlite_conf.database
 
@@ -126,10 +118,10 @@ class DataDriver(storage.DataDriverBase):
         :param o: a Python str, unicode, int, long, float, bool, None
                   or a dict or list of %o
         """
-        return sqlite3.Binary(msgpack.dumps(o))
+        return sqlite3.Binary(json.dumps(o))
 
     sqlite3.register_converter('DOCUMENT', lambda s:
-                               msgpack.loads(s, encoding='utf-8'))
+                               json.loads(s, encoding='utf-8'))
 
     @staticmethod
     def uuid(o):
@@ -214,8 +206,9 @@ class ControlDriver(storage.ControlDriverBase):
     def __init__(self, conf, cache):
         super(ControlDriver, self).__init__(conf, cache)
 
-        self.conf.register_opts(_SQLITE_OPTIONS, group=_SQLITE_GROUP)
-        self.sqlite_conf = self.conf[_SQLITE_GROUP]
+        self.conf.register_opts(options.SQLITE_OPTIONS,
+                                group=options.SQLITE_GROUP)
+        self.sqlite_conf = self.conf[options.SQLITE_GROUP]
 
         self.__path = self.sqlite_conf.database
 

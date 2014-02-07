@@ -20,6 +20,9 @@ import six
 
 from oslo.config import cfg
 
+from marconi.common import utils
+
+
 _LIMITS_OPTIONS = [
     cfg.IntOpt('default_queue_paging', default=10,
                help='Default queue pagination size'),
@@ -29,6 +32,10 @@ _LIMITS_OPTIONS = [
 ]
 
 _LIMITS_GROUP = 'limits:storage'
+
+
+def _config_options():
+    return utils.options_iter(_LIMITS_OPTIONS, _LIMITS_GROUP)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -131,7 +138,7 @@ class ControllerBase(object):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class QueueBase(ControllerBase):
+class Queue(ControllerBase):
     """This class is responsible for managing queues.
 
     Queue operations include CRUD, monitoring, etc.
@@ -224,7 +231,7 @@ class QueueBase(ControllerBase):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class MessageBase(ControllerBase):
+class Message(ControllerBase):
     """This class is responsible for managing message CRUD."""
 
     @abc.abstractmethod
@@ -340,7 +347,7 @@ class MessageBase(ControllerBase):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class ClaimBase(ControllerBase):
+class Claim(ControllerBase):
 
     @abc.abstractmethod
     def get(self, queue, claim_id, project=None):
