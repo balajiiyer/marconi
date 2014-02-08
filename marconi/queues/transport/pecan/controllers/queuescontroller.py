@@ -16,19 +16,23 @@
 from pecan import expose, rest, response, request
 from marconi.openstack.common.gettextutils import _
 import marconi.openstack.common.log as logging
-from marconi.queues.transport import base
 
 
 LOG = logging.getLogger(__name__)
 
 
-class QueuesController(rest.RestController, base.DriverBase):
+class QueuesController(rest.RestController):
 
     __slots__ = ('queue_controller', 'message_controller')
 
-    #def __init__(self):
-     #   self.queue_controller = self._storage.queue_controller
-      #  self.message_controller = self._storage.message_controller
+    def __init__(self, queue_controller, message_controller):
+        self.queue_controller = queue_controller
+        self.message_controller = message_controller
+
+    #Ugly lazy init
+    def lazy_init(self, queue_controller, message_controller):
+        self.queue_controller = queue_controller
+        self.message_controller = message_controller
 
     @expose('json')
     def index(self):

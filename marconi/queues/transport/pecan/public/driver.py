@@ -24,4 +24,11 @@ class Driver(driver.DriverBase):
 
     @property
     def bridge(self):
-        rootcontroller.RootController()
+        queue_controller = self._storage.queue_controller
+        message_controller = self._storage.message_controller
+        #claim_controller = self._storage.claim_controller
+
+        #rootcontroller, being the entry point cannot accept any params
+        root = rootcontroller.RootController()
+        #resorting to lazy_init, which doesnt work well
+        root.lazy_init(queue_controller, message_controller)
