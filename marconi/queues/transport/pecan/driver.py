@@ -85,6 +85,10 @@ class DriverBase(transport.DriverBase):
         self._wsgi_conf = self._conf[_WSGI_GROUP]
         self._validate = validation.Validator(self._conf)
 
+        #balajiiyer: calling bridge explicitly here, not the best way
+        # dont know what is the cleaner way
+        self.bridge
+
         #balajiiyer: get pecan config here
         pc = get_pecan_config()
         pc.app.debug = True
@@ -95,8 +99,6 @@ class DriverBase(transport.DriverBase):
         #self.app = None
         #self._init_routes()
         self._init_middleware()
-        #balajiiyer: calling bridge explicitly here
-        self.bridge
 
     @decorators.lazy_property(write=False)
     def before_hooks(self):
