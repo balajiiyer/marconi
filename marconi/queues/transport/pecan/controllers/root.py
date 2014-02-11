@@ -13,34 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#from marconi.queues.transport import base
-from marconi.queues.transport.pecan.controllers import healthcontroller
-from marconi.queues.transport.pecan.controllers import queuescontroller
-#from marconi.queues import bootstrap
-#from oslo.config import cfg
+from marconi.queues.transport.pecan.controllers import health as h
+from marconi.queues.transport.pecan.controllers import queues as q
 from pecan import expose
 
 
-class RootController(object):
+class Controller(object):
 
-    # Ugly, remove this
-    qc = None
-    mc = None
-
-    #def __init__(self, queue_controller, message_controller):
-     #   self.queue_control = queue_controller
-      #  self.message_control = message_controller
-
-    def lazy_init(self, queue_controller, message_controller):
-        qc = queue_controller
-        mc = message_controller
+    def __init__(self, conf, storage, cache, control):
+        self._conf = conf
+        self._storage = storage
+        self._cache = cache
+        self._control = control
 
     @expose()
     def index(self):
         return "welcome to pecan routing"
 
-    health = healthcontroller.HealthController()
+    def health(self):
+        return h.Controller(self._storage)
 
     # qc and mc are null, because this gets called first, even before
     # when it gets to this point.
-    queues = queuescontroller.QueuesController(qc, mc)
+    def queues(self):
+        return q.Controller(self._storage)

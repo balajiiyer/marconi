@@ -23,16 +23,9 @@ LOG = logging.getLogger(__name__)
 
 class QueuesController(rest.RestController):
 
-    __slots__ = ('queue_controller', 'message_controller')
-
-    def __init__(self, queue_controller, message_controller):
-        self.queue_controller = queue_controller
-        self.message_controller = message_controller
-
-    #Ugly lazy init
-    def lazy_init(self, queue_controller, message_controller):
-        self.queue_controller = queue_controller
-        self.message_controller = message_controller
+    def __init__(self, storage):
+        self.queue_controller = storage.queue_controller
+        self.message_controller = storage.message_controller
 
     @expose('json')
     def index(self):
@@ -42,7 +35,7 @@ class QueuesController(rest.RestController):
     @expose('json')
     def put(self, data):
         project_id = request.headers.get('x-project-id')
-        print project_id
+        print(project_id)
         queue_name = data
         created = False
         LOG.debug(_(u'Queue item PUT - queue: %(queue)s, '
@@ -52,12 +45,12 @@ class QueuesController(rest.RestController):
         try:
             created = self.queue_controller.create(
                 queue_name, project=project_id)
-            print "queue created"
         except Exception as ex:
+            # TODO(balajiiyer): wsgi_errors wraps falcon, rewrite this
+            # with wsme
             LOG.exception(ex)
-            #balajiiyer: wsgi_errors wraps falcon, rewrite this with wsme
-            #description = _(u'Queue could not be created.')
-            #raise wsgi_errors.HTTPServiceUnavailable(description)
+            response.status = 503
+            return "Could not create queue"
 
         response.status = 201 if created else 204
         response.location = request.path

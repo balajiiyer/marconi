@@ -13,11 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pecan import expose, rest, response
+from pecan import expose, response
 
 
-class HealthController(rest.RestController):
-    @expose('json')
+class Controller(object):
+
+    def __init__(self, storage):
+        self._storage = storage
+
+    @expose(method='GET')
     def index(self):
-        response.status = 200
-        return "Health Controller"
+        response.status = (204 if self._storage.is_alive() else 503)
