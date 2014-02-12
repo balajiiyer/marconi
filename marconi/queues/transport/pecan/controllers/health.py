@@ -21,6 +21,6 @@ class Controller(object):
     def __init__(self, storage):
         self._storage = storage
 
-    @expose(method='GET')
+    @expose()
     def index(self):
         response.status = (204 if self._storage.is_alive() else 503)

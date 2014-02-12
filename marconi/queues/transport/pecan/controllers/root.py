@@ -15,7 +15,7 @@
 
 from marconi.queues.transport.pecan.controllers import health as h
 from marconi.queues.transport.pecan.controllers import queues as q
-from pecan import expose
+from pecan import expose, response
 
 
 class Controller(object):
@@ -25,15 +25,21 @@ class Controller(object):
         self._storage = storage
         self._cache = cache
         self._control = control
+        self._health = h.Controller(self._storage)
+        self._queues = q.Controller(self._storage)
 
     @expose()
     def index(self):
         return "welcome to pecan routing"
 
-    def health(self):
-        return h.Controller(self._storage)
+    @expose()
+    def health(self, *remainder):
+        print(remainder)
+        return self._health.index()
 
     # qc and mc are null, because this gets called first, even before
     # when it gets to this point.
-    def queues(self):
-        return q.Controller(self._storage)
+    @expose()
+    def queues(self, *remainder):
+        print(remainder)
+        return self._queues.index()

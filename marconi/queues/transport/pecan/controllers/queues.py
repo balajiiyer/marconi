@@ -21,7 +21,7 @@ import marconi.openstack.common.log as logging
 LOG = logging.getLogger(__name__)
 
 
-class QueuesController(rest.RestController):
+class Controller(rest.RestController):
 
     def __init__(self, storage):
         self.queue_controller = storage.queue_controller
