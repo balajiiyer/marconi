@@ -37,8 +37,7 @@ class Controller(object):
         print(remainder)
         return self._health.index()
 
-    # qc and mc are null, because this gets called first, even before
-    # when it gets to this point.
+
     @expose()
     def queues(self, *remainder):
         print(remainder)
