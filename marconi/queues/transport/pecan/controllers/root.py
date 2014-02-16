@@ -15,7 +15,7 @@
 
 from marconi.queues.transport.pecan.controllers import health as h
 from marconi.queues.transport.pecan.controllers import queues as q
-from pecan import expose, response
+from pecan import expose, request
 
 
 class Controller(object):
@@ -37,8 +37,18 @@ class Controller(object):
         print(remainder)
         return self._health.index()
 
-
     @expose()
     def queues(self, *remainder):
-        print(remainder)
-        return self._queues.index()
+        #TODO(balaji.iyer) default routing doesnt work.
+        #fix this
+        if request.method == "PUT":
+            self._queues.put(str(remainder))
+
+        if request.method == "GET":
+            self._queues.get()
+
+        if request.method == "DELETE":
+            self._queues.delete(str(remainder))
+
+        if request.method == "HEAD":
+            self._queues.head(str(remainder))

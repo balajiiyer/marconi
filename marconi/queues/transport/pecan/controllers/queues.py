@@ -16,6 +16,7 @@
 from pecan import expose, rest, response, request
 from marconi.openstack.common.gettextutils import _
 import marconi.openstack.common.log as logging
+from marconi.queues.transport import utils
 
 
 LOG = logging.getLogger(__name__)
@@ -28,9 +29,44 @@ class Controller(rest.RestController):
         self.message_controller = storage.message_controller
 
     @expose('json')
-    def index(self):
+    def get(self):
+
+        kwargs = {}
+
+        project_id = request.headers.get('x-project-id')
+        results = self.queue_controller.list(project=project_id, **kwargs)
+
+        # Buffer list of queues
+        queues = list(next(results))
+
+        # Check for an empty list
+        if len(queues) == 0:
+            print("Len is 0")
+            response.status = 204
+            return
+
+         # Got some. Prepare the response.
+        kwargs['marker'] = next(results)
+        for each_queue in queues:
+            each_queue['href'] = request.path + '/' + each_queue['name']
+
+        response_body = {
+            'queues': queues,
+            'links': [
+                {
+                    'rel': 'next',
+                    'href': request.path
+                }
+            ]
+        }
+
+        response.content_location = request.path
         response.status = 200
-        return "Queues Controller"
+        response.text = utils.to_json(response_body)
+
+    @expose('json')
+    def index(self):
+        print("welcome to queues controller")
 
     @expose('json')
     def put(self, data):
@@ -55,3 +91,37 @@ class Controller(rest.RestController):
         response.status = 201 if created else 204
         response.location = request.path
         response.status = 201
+
+    @expose('json')
+    def delete(self, data):
+
+        queue_name = data
+        project_id = request.headers.get('x-project-id')
+
+        LOG.debug(_(u'Queue item DELETE - queue: %(queue)s, '
+                    u'project: %(project)s'),
+                  {'queue': queue_name, 'project': project_id})
+        try:
+            self.queue_controller.delete(queue_name, project=project_id)
+
+        except Exception as ex:
+            LOG.exception(ex)
+
+        response.status = 204
+
+    @expose('json')
+    def head(self, data):
+
+        queue_name = data
+        project_id = request.headers.get('x-project-id')
+
+        LOG.debug(_(u'Queue item exists - queue: %(queue)s, '
+                    u'project: %(project)s'),
+                  {'queue': queue_name, 'project': project_id})
+
+        if self.queue_controller.exists(queue_name, project=project_id):
+            response.status = 204
+        else:
+            response.status = 404
+
+        response.content_location = request.path
