@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from marconi.queues.transport.pecan.controllers import health as h
+from marconi.queues.transport.pecan.controllers import messages as m
 from marconi.queues.transport.pecan.controllers import queues as q
 from pecan import expose, request
 
@@ -27,6 +28,7 @@ class Controller(object):
         self._control = control
         self._health = h.Controller(self._storage)
         self._queues = q.Controller(self._storage)
+        self._messages = m.Controller(self._storage)
 
     @expose()
     def index(self):
@@ -52,3 +54,15 @@ class Controller(object):
 
         if request.method == "HEAD":
             self._queues.head(str(remainder))
+
+    @expose()
+    def messages(self, *remainder):
+
+        if request.method == "GET":
+            self._messages.get(str(remainder))
+
+        if request.method == "PUT":
+            self._messages.put(str(remainder))
+
+        if request.method == "POST":
+            self._messages.post(str(remainder))
