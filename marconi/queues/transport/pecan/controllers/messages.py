@@ -23,19 +23,21 @@ from marconi.queues.transport import utils
 LOG = logging.getLogger(__name__)
 MESSAGE_POST_SPEC = (('ttl', int), ('body', '*'))
 
-class Controller(rest.RestController):
+class MessagesController(rest.RestController):
 
-    def __init__(self, storage):
-        self.queue_controller = storage.queue_controller
-        self.message_controller = storage.message_controller
+    @property
+    def storage(self):
+        return request.context['marconi'].storage
 
     @expose('json')
     def get(self, data):
         pass
 
+    @expose('json')
     def put(self, data):
         pass
 
+    @expose('json')
     def post(self, data):
         print("in post message")
         queue_name = data
@@ -67,7 +69,7 @@ class Controller(rest.RestController):
         try:
             self._validate.message_posting(messages)
 
-            message_ids = self.message_controller.post(
+            message_ids = self.storage.message_controller.post(
                 queue_name,
                 messages=messages,
                 project=project_id,
