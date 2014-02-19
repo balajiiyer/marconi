@@ -13,14 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pecan import expose, response
+from pecan import expose, request, response
 
 
-class Controller(object):
+class HealthController(object):
 
-    def __init__(self, storage):
-        self._storage = storage
+    @property
+    def storage(self):
+        return request.context['marconi'].storage
 
     @expose()
     def index(self):
-        response.status = (204 if self._storage.is_alive() else 503)
+        response.status = (204 if self.storage.is_alive() else 503)

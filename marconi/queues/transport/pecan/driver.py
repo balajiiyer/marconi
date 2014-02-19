@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import abc
+import collections
 from wsgiref import simple_server
 
 from oslo.config import cfg
@@ -52,8 +53,9 @@ class DriverBase(transport.DriverBase):
         self._wsgi_conf = self._conf[_WSGI_GROUP]
         self._validate = validation.Validator(self._conf)
 
-        root_ctrl = root.Controller(conf, storage, cache, control)
-        self.app = pecan.Pecan(root_ctrl)
+        self.app = pecan.Pecan(root.RootController(), hooks=[
+            DriverMetadataHook(conf, storage, cache, control)
+        ])
         self._init_middleware()
 
     def _init_middleware(self):
@@ -73,3 +75,21 @@ class DriverBase(transport.DriverBase):
                                           self._wsgi_conf.port,
                                           self.app)
         httpd.serve_forever()
+
+
+MarconiDriverConf = collections.namedtuple('MarconiDriverConf', (
+    'conf', 'storage', 'cache', 'control'
+))
+
+
+class DriverMetadataHook(pecan.hooks.PecanHook):
+    """
+    A pecan hook that attaches driver metadata to the request so that it
+    can be accessed from within controller code.
+    """
+
+    def __init__(self, conf, storage, cache, control):
+        self.conf = MarconiDriverConf(conf, storage, cache, control)
+
+    def before(self, state):
+        state.request.context['marconi'] = self.conf

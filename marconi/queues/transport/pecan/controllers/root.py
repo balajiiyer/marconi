@@ -13,56 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marconi.queues.transport.pecan.controllers import health as h
-from marconi.queues.transport.pecan.controllers import messages as m
-from marconi.queues.transport.pecan.controllers import queues as q
+from marconi.queues.transport.pecan.controllers import health
+from marconi.queues.transport.pecan.controllers import messages
+from marconi.queues.transport.pecan.controllers import queues
 from pecan import expose, request
 
 
-class Controller(object):
+class VersionController(object):
 
-    def __init__(self, conf, storage, cache, control):
-        self._conf = conf
-        self._storage = storage
-        self._cache = cache
-        self._control = control
-        self._health = h.Controller(self._storage)
-        self._queues = q.Controller(self._storage)
-        self._messages = m.Controller(self._storage)
+    health = health.HealthController()
+    queues = queues.QueuesController()
+    messages = messages.MessagesController()
+
+
+class RootController(object):
+
+    v1 = VersionController()
 
     @expose()
     def index(self):
         return "welcome to pecan routing"
-
-    @expose()
-    def health(self, *remainder):
-        print(remainder)
-        return self._health.index()
-
-    @expose()
-    def queues(self, *remainder):
-        #TODO(balaji.iyer) Not sure why default routing doesn't work
-        #fix this
-        if request.method == "PUT":
-            self._queues.put(str(remainder[0]))
-
-        if request.method == "GET":
-            self._queues.get_all()
-
-        if request.method == "DELETE":
-            self._queues.delete(str(remainder[0]))
-
-        if request.method == "HEAD":
-            self._queues.head(str(remainder[0]))
-
-    @expose()
-    def messages(self, *remainder):
-        #TODO(balaji.iyer) investigate why default routign doesn't work
-        if request.method == "GET":
-            self._messages.get(str(remainder[0]))
-
-        if request.method == "PUT":
-            self._messages.put(str(remainder[0]))
-
-        if request.method == "POST":
-            self._messages.post(str(remainder[0]))

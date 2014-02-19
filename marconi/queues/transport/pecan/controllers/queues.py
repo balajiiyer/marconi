@@ -21,11 +21,11 @@ import json
 LOG = logging.getLogger(__name__)
 
 
-class Controller(rest.RestController):
+class QueuesController(rest.RestController):
 
-    def __init__(self, storage):
-        self.queue_controller = storage.queue_controller
-        self.message_controller = storage.message_controller
+    @property
+    def storage(self):
+        return request.context['marconi'].storage
 
     @expose('json')
     def get_all(self):
@@ -33,7 +33,10 @@ class Controller(rest.RestController):
         kwargs = {}
 
         project_id = request.headers.get('x-project-id')
-        results = self.queue_controller.list(project=project_id, **kwargs)
+        results = self.storage.queue_controller.list(
+            project=project_id,
+            **kwargs
+        )
 
         # Buffer list of queues
         queues = list(next(results))
@@ -59,15 +62,7 @@ class Controller(rest.RestController):
             ]
         }
 
-        #Fixme: (balajiiyer) content/type is still text/html
-        #response.content_type = 'application/json'
-        #response.content_location = request.path
-        response.json_body = response_body
-        #return response_body
-
-    @expose('json')
-    def index(self):
-        print("welcome to queues controller")
+        return response_body
 
     @expose(content_type='json')
     def put(self, data):
@@ -79,7 +74,7 @@ class Controller(rest.RestController):
                   {'queue': queue_name, 'project': project_id})
 
         try:
-            created = self.queue_controller.create(
+            created = self.storage.queue_controller.create(
                 queue_name, project=project_id)
         except Exception as ex:
             # TODO(balajiiyer): rewrite this with wsme
@@ -100,7 +95,9 @@ class Controller(rest.RestController):
                     u'project: %(project)s'),
                   {'queue': queue_name, 'project': project_id})
         try:
-            self.queue_controller.delete(queue_name, project=project_id)
+            self.storage.queue_controller.delete(
+                queue_name, project=project_id
+            )
 
         except Exception as ex:
             LOG.exception(ex)
@@ -117,7 +114,9 @@ class Controller(rest.RestController):
                     u'project: %(project)s'),
                   {'queue': queue_name, 'project': project_id})
 
-        if self.queue_controller.exists(queue_name, project=project_id):
+        if self.storage.queue_controller.exists(
+                queue_name, project=project_id
+            ):
             response.status = 204
         else:
             response.status = 404
