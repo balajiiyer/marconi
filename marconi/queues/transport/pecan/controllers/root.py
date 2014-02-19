@@ -16,7 +16,7 @@
 from marconi.queues.transport.pecan.controllers import health
 from marconi.queues.transport.pecan.controllers import messages
 from marconi.queues.transport.pecan.controllers import queues
-from pecan import expose, request
+from pecan import expose
 
 
 class VersionController(object):

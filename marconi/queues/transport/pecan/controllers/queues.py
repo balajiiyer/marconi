@@ -16,7 +16,6 @@
 from pecan import expose, rest, response, request
 from marconi.openstack.common.gettextutils import _
 import marconi.openstack.common.log as logging
-import json
 
 LOG = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class QueuesController(rest.RestController):
          # Got some. Prepare the response.
         kwargs['marker'] = next(results)
         for each_queue in queues:
-            each_queue['href'] = request.path + '/' + each_queue['name']
+            each_queue['href'] = request.path + each_queue['name']
 
         response_body = {
             'queues': queues,
@@ -64,7 +63,7 @@ class QueuesController(rest.RestController):
 
         return response_body
 
-    @expose(content_type='json')
+    @expose('json')
     def put(self, data):
         project_id = request.headers.get('x-project-id')
         print(project_id)
