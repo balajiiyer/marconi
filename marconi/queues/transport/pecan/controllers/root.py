@@ -41,28 +41,28 @@ class Controller(object):
 
     @expose()
     def queues(self, *remainder):
-        #TODO(balaji.iyer) default routing doesnt work.
+        #TODO(balaji.iyer) Not sure why default routing doesn't work
         #fix this
         if request.method == "PUT":
-            self._queues.put(str(remainder))
+            self._queues.put(str(remainder[0]))
 
         if request.method == "GET":
-            self._queues.get()
+            self._queues.get_all()
 
         if request.method == "DELETE":
-            self._queues.delete(str(remainder))
+            self._queues.delete(str(remainder[0]))
 
         if request.method == "HEAD":
-            self._queues.head(str(remainder))
+            self._queues.head(str(remainder[0]))
 
     @expose()
     def messages(self, *remainder):
-
+        #TODO(balaji.iyer) investigate why default routign doesn't work
         if request.method == "GET":
-            self._messages.get(str(remainder))
+            self._messages.get(str(remainder[0]))
 
         if request.method == "PUT":
-            self._messages.put(str(remainder))
+            self._messages.put(str(remainder[0]))
 
         if request.method == "POST":
-            self._messages.post(str(remainder))
+            self._messages.post(str(remainder[0]))

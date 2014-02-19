@@ -14,3 +14,4 @@ stevedore>=0.12
 six>=1.4.1
 oslo.config>=1.2.0
 sqlalchemy>=0.7.8,<=0.7.99
+pecan>=0.4.4

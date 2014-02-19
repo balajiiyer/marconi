@@ -16,8 +16,7 @@
 from pecan import expose, rest, response, request
 from marconi.openstack.common.gettextutils import _
 import marconi.openstack.common.log as logging
-from marconi.queues.transport import utils
-
+import json
 
 LOG = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ class Controller(rest.RestController):
         self.message_controller = storage.message_controller
 
     @expose('json')
-    def get(self):
+    def get_all(self):
 
         kwargs = {}
 
@@ -60,20 +59,21 @@ class Controller(rest.RestController):
             ]
         }
 
-        response.content_location = request.path
-        response.status = 200
-        response.text = utils.to_json(response_body)
+        #Fixme: (balajiiyer) content/type is still text/html
+        #response.content_type = 'application/json'
+        #response.content_location = request.path
+        response.json_body = response_body
+        #return response_body
 
     @expose('json')
     def index(self):
         print("welcome to queues controller")
 
-    @expose('json')
+    @expose(content_type='json')
     def put(self, data):
         project_id = request.headers.get('x-project-id')
         print(project_id)
         queue_name = data
-        created = False
         LOG.debug(_(u'Queue item PUT - queue: %(queue)s, '
                     u'project: %(project)s'),
                   {'queue': queue_name, 'project': project_id})
@@ -82,15 +82,13 @@ class Controller(rest.RestController):
             created = self.queue_controller.create(
                 queue_name, project=project_id)
         except Exception as ex:
-            # TODO(balajiiyer): wsgi_errors wraps falcon, rewrite this
-            # with wsme
+            # TODO(balajiiyer): rewrite this with wsme
             LOG.exception(ex)
             response.status = 503
             return "Could not create queue"
 
         response.status = 201 if created else 204
         response.location = request.path
-        response.status = 201
 
     @expose('json')
     def delete(self, data):
