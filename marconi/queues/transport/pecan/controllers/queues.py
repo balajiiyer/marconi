@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pecan import expose, rest, response, request
+from pecan import abort, expose, rest, response, request
 from marconi.openstack.common.gettextutils import _
 import marconi.openstack.common.log as logging
 
@@ -26,12 +26,30 @@ class QueuesController(rest.RestController):
     def storage(self):
         return request.context['marconi'].storage
 
+    # Havent found a native way to do this in pecan.
+    def _query_to_kwargs(self, name, value, store=None):
+
+        if store is not None:
+            if value is not None:
+                store[name] = value
+
+        return value
+
+        abort(400)
+
     @expose('json')
-    def get_all(self):
+    def get_all(self, detailed=None, marker=None, limit=None):
 
         kwargs = {}
-
         project_id = request.headers.get('x-project-id')
+
+        self._query_to_kwargs('detailed', detailed, kwargs)
+        self._query_to_kwargs('marker', marker, kwargs)
+        #handle exception for the cast here
+        self._query_to_kwargs('limit', int(limit), kwargs)
+
+        print(len(kwargs))
+
         results = self.storage.queue_controller.list(
             project=project_id,
             **kwargs
