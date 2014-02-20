@@ -17,11 +17,13 @@ from pecan import expose, rest, response, request
 from marconi.openstack.common.gettextutils import _
 import marconi.openstack.common.log as logging
 from marconi.queues.storage import errors as storage_errors
-from marconi.queues.transport.wsgi import utils as wsgi_utils
 from marconi.queues.transport import utils
+from marconi.queues.transport.wsgi import utils as wsgi_utils
+
 
 LOG = logging.getLogger(__name__)
 MESSAGE_POST_SPEC = (('ttl', int), ('body', '*'))
+
 
 class MessagesController(rest.RestController):
 

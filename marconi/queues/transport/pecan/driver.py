@@ -83,7 +83,8 @@ MarconiDriverConf = collections.namedtuple('MarconiDriverConf', (
 
 
 class DriverMetadataHook(pecan.hooks.PecanHook):
-    """
+    """Pecan Webhook
+
     A pecan hook that attaches driver metadata to the request so that it
     can be accessed from within controller code.
     """
