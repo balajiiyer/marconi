@@ -42,7 +42,7 @@ _GENERAL_OPTIONS = [
 ]
 
 _DRIVER_OPTIONS = [
-    cfg.StrOpt('transport', default='pecan',
+    cfg.StrOpt('transport', default='wsgi',
                help='Transport driver to use'),
     cfg.StrOpt('storage', default='sqlite',
                help='Storage driver to use'),
