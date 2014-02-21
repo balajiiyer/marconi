@@ -43,7 +43,8 @@ class QueuesController(rest.RestController):
         self._query_to_kwargs('detailed', detailed, kwargs)
         self._query_to_kwargs('marker', marker, kwargs)
         #handle exception for the cast here
-        self._query_to_kwargs('limit', int(limit), kwargs)
+        if limit is not None:
+            self._query_to_kwargs('limit', int(limit), kwargs)
 
         print(len(kwargs))
 
